@@ -1,44 +1,461 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Basit Oda</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mojo Rent A Car | İstanbul Ultra Lüks Araç Kiralama</title>
+    <!-- FontAwesome Iconları için -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: sans-serif; text-align: center; background: #f0f2f5; }
-        #oda { border: 2px solid #333; width: 300px; margin: 20px auto; padding: 20px; background: white; border-radius: 15px; }
-        .oyuncu { background: #e1ffc7; margin: 5px; padding: 10px; border-radius: 5px; }
+        /* GENEL AYARLAR */
+        :root {
+            --primary-red: #d90429;      
+            --dark-red: #ef233c;         
+            --pure-white: #ffffff;
+            --light-gray: #f8f9fa;
+            --dark-charcoal: #2b2d42;    
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: var(--dark-charcoal);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* ANA SİTE BAŞLANGIÇTA TAMAMEN GİZLİ */
+        #main-site {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        /* DRİFT ATAN ARAÇLI LOADING EKRANI */
+        #loader-wrapper {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #111; 
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            text-align: center;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader-content { width: 300px; }
+
+        .drift-car-container {
+            position: relative;
+            font-size: 3.5rem;
+            color: var(--primary-red);
+            margin-bottom: 20px;
+            height: 80px;
+        }
+
+        .drift-car {
+            animation: driftAction 1.5s infinite ease-in-out;
+            display: inline-block;
+        }
+
+        @keyframes driftAction {
+            0% { transform: translateX(-50px) rotate(0deg); }
+            40% { transform: translateX(20px) rotate(-15deg); color: var(--dark-red); }
+            50% { transform: translateX(30px) rotate(25deg); } 
+            70% { transform: translateX(10px) rotate(10deg); }
+            100% { transform: translateX(-50px) rotate(0deg); }
+        }
+
+        .loader-text {
+            font-size: 1.8rem;
+            letter-spacing: 4px;
+            margin: 10px 0;
+            font-weight: 900;
+        }
+
+        .loader-text::after {
+            content: '';
+            display: block;
+            width: 50px; height: 3px; background: var(--primary-red); margin: 5px auto;
+        }
+
+        .progress-bar {
+            width: 100%; height: 6px; background: #333; border-radius: 3px; margin-top: 15px; overflow: hidden;
+        }
+        .progress-fill {
+            width: 100%; height: 100%; background: var(--primary-red);
+            animation: fillUp 3s linear forwards;
+        }
+        @keyframes fillUp { 0% { width: 0%; } 100% { width: 100%; } }
+
+        /* HEADER & NAVIGASYON */
+        header {
+            background: var(--pure-white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 8%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            position: sticky; top: 0; z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.6rem; font-weight: 900; color: var(--dark-charcoal); letter-spacing: 1px;
+        }
+        .logo span { color: var(--primary-red); margin-left: 5px; }
+
+        nav a {
+            text-decoration: none; color: var(--dark-charcoal); font-weight: 600; margin: 0 15px;
+            transition: color 0.3s;
+        }
+        nav a:hover { color: var(--primary-red); }
+
+        .instagram-nav-btn {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-weight: 600;
+            display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(220,39,67,0.3);
+        }
+
+        /* HERO & ARAMA MOTORU */
+        .hero {
+            position: relative;
+            background: url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1600') center/cover no-repeat;
+            padding: 100px 20px; text-align: center; color: white;
+        }
+        .hero-overlay {
+            position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0, 0, 0, 0.65); z-index: 1;
+        }
+
+        .search-container { position: relative; z-index: 2; max-width: 1000px; margin: 0 auto; }
+        .search-container h1 { font-size: 2.8rem; font-weight: 800; margin-bottom: 10px; }
+
+        .search-form {
+            background: var(--pure-white); padding: 30px; border-radius: 15px;
+            display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; margin-top: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .form-group { flex: 1; min-width: 220px; text-align: left; }
+        .form-group label { display: block; color: var(--dark-charcoal); font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;}
+        .form-group label i { color: var(--primary-red); margin-right: 5px; }
+        
+        .form-group input, .form-group select {
+            width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; font-size: 1rem;
+            background-color: white;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary-red); outline: none; }
+
+        .btn-search {
+            flex: 1; min-width: 220px; background: var(--primary-red); color: white;
+            border: none; padding: 16px; font-size: 1.1rem; font-weight: bold; border-radius: 8px;
+            cursor: pointer; transition: background 0.3s; transform: translateY(-1px);
+        }
+        .btn-search:hover { background: #b0021e; }
+
+        /* KURUMSAL BÖLÜM */
+        .about-section { padding: 80px 10%; background: var(--pure-white); }
+        .badge { background: rgba(217, 4, 41, 0.1); color: var(--primary-red); padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; }
+        .about-text h2 { font-size: 2.3rem; margin: 15px 0; font-weight: 800; }
+        .about-text p { color: #666; line-height: 1.8; font-size: 1.1rem; max-width: 800px; }
+
+        .stats { display: flex; gap: 40px; margin-top: 30px; }
+        .stat-item strong { display: block; font-size: 2.2rem; color: var(--primary-red); font-weight: 800; }
+        .stat-item span { color: #555; font-size: 0.95rem; font-weight: 600; }
+
+        /* ARAÇ LİSTELEME KARTLARI */
+        .cars-section { padding: 60px 8%; }
+        .section-title { text-align: center; margin-bottom: 50px; }
+        .section-title h2 { font-size: 2.2rem; font-weight: 800; }
+        .section-title p { color: #666; }
+
+        .cars-grid { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; }
+        .car-card {
+            background: var(--pure-white); width: 350px; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; transition: transform 0.3s;
+        }
+        .car-card:hover { transform: translateY(-5px); border-color: var(--primary-red); }
+        .car-card img { width: 100%; height: 220px; object-fit: cover; }
+
+        .car-info { padding: 20px; }
+        .car-subtitle { margin: 0 0 5px 0; font-size: 1.3rem; font-weight: 800; color: #111; }
+        .car-desc { color: #e63946; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
+        
+        .specs { display: flex; gap: 15px; color: #777; font-size: 0.9rem; margin-bottom: 20px; }
+        .specs i { color: var(--primary-red); }
+
+        .price-box { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #eee; padding-top: 15px; }
+        .daily-price { font-size: 1.3rem; font-weight: 800; color: #222; }
+        .total-calculated-box { background: #fff5f5; padding: 8px; border-radius: 6px; border: 1px dashed var(--primary-red); font-weight: 800; color: var(--primary-red); display: none; }
+        
+        .btn-insta-rent {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white; border: none; padding: 12px; text-align: center;
+            border-radius: 6px; font-weight: 700; cursor: pointer; text-decoration: none;
+            display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform 0.2s;
+        }
+        .btn-insta-rent:hover { transform: scale(1.02); color: white;}
+
+        /* FOOTER & İLETİŞİM */
+        footer { background: var(--dark-charcoal); color: white; padding: 60px 8% 20px 8%; }
+        .footer-content { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 40px; margin-bottom: 40px; }
+        .footer-info h3 span { color: var(--primary-red); }
+        .footer-info p { color: #bbb; margin: 10px 0; }
+        .footer-info i { color: var(--primary-red); margin-right: 8px; }
+
+        .instagram-large-btn {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;
+            display: inline-flex; align-items: center; gap: 10px; margin-top: 10px; box-shadow: 0 4px 15px rgba(220,39,67,0.4);
+        }
+        .footer-bottom { border-top: 1px solid #444; padding-top: 20px; text-align: center; color: #888; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-    <h1>Sesli Oda Taslağı</h1>
-    
-    <div id="oda">
-        <h3>İçeridekiler</h3>
-        <div id="liste">
-            <p>Henüz kimse yok...</p>
+    <!-- DRİFT ATAN ARAÇLI LOADING EKRANI -->
+    <div id="loader-wrapper">
+        <div class="loader-content">
+            <div class="drift-car-container">
+                <i class="fa-solid fa-car-side drift-car"></i>
+            </div>
+            <h2 class="loader-text">MOJO RENT A CAR</h2>
+            <p>İstanbul'un En Prestijli Filosu Hazırlanıyor...</p>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
         </div>
     </div>
 
-    <input type="text" id="isimInput" placeholder="Adını yaz...">
-    <button onclick="katil()">Odaya Gir</button>
+    <!-- ANA SİTE İÇERİĞİ -->
+    <div id="main-site">
 
-    <script>
-        function katil() {
-            let isim = document.getElementById('isimInput').value;
-            if(isim) {
-                let liste = document.getElementById('liste');
-                // Eğer ilk kişi giriyorsa "henüz kimse yok" yazısını sil
-                if(liste.innerHTML.includes("Henüz")) liste.innerHTML = "";
+        <!-- NAVIGASYON ÜST BAR -->
+        <header>
+            <div class="logo">MOJO<span>RENT A CAR</span></div>
+            <nav>
+                <a href="#about">Kurumsal</a>
+                <a href="#cars">Araç Filomuz</a>
+                <a href="#contact">İletişim</a>
+            </nav>
+            <a href="https://instagram.com/7mojoo" target="_blank" class="instagram-nav-btn">
+                <i class="fab fa-instagram"></i> @7mojoo
+            </a>
+        </header>
+
+        <!-- HERO BÖLÜMÜ VE ARAMA MOTORU -->
+        <section class="hero">
+            <div class="hero-overlay"></div>
+            <div class="search-container">
+                <h1>İstanbul Havalimanı VIP Araç Kiralama</h1>
+                <p>Mojo Rent A Car kalitesi ve yüksek segment araç filosu ile benzersiz bir deneyim.</p>
                 
-                // Yeni bir oyuncu kutusu oluştur
-                liste.innerHTML += <div class="oyuncu">🟢 ${isim}</div>;
-                document.getElementById('isimInput').value = ""; // Kutuyu temizle
-            } else {
-                alert("Lütfen bir isim yaz!");
-            }
-        }
-    </script>
+                <form id="rental-search-form" class="search-form">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-location-dot"></i> Teslim Alma Yeri</label>
+                        <select id="pickup-location" required>
+                            <option value="IST">İstanbul Havalimanı (IST)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-calendar-days"></i> Alış Tarihi</label>
+                        <input type="date" id="pickup-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-calendar-check"></i> İade Tarihi</label>
+                        <input type="date" id="dropoff-date" required>
+                    </div>
+                    <button type="submit" class="btn-search">En Ucuz Aracı Bul</button>
+                </form>
+            </div>
+        </section>
 
+        <!-- KÖKLÜ ŞİRKET TANITIMI (KURUMSAL) -->
+        <section id="about" class="about-section">
+            <div class="container">
+                <div class="about-text">
+                    <span class="badge">Sektörün Öncüsü</span>
+                    <h2>Mojo Güvencesi ve Çeyrek Asırlık Vizyon</h2>
+                    <p>Mojo Rent A Car, lüks araç kiralama sektöründe İstanbul genelinde standartları belirleyen köklü bir kuruluştur. Filomuzda sadece en yüksek donanıma sahip, premium araçlar yer almaktadır. İş dünyasından sanata, geniş bir kitleye hitap eden hizmet anlayışımız ve 7/24 özel asistan desteğimizle her seyahatinizi kusursuz bir deneyime dönüştürüyoruz.</p>
+                    <div class="stats">
+                        <div class="stat-item"><strong>15+</strong><span>Yıllık Deneyim</span></div>
+                        <div class="stat-item"><strong>Premium</strong><span>Filo Segmenti</span></div>
+                        <div class="stat-item"><strong>7/24</strong><span>V.I.P Destek</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ARAÇ LİSTELEME -->
+        <section id="cars" class="cars-section">
+            <div class="section-title">
+                <h2>Mojo Premium Filo</h2>
+                <p>Tarih seçimi yaparak toplam kiralama bedelinizi anlık hesaplayabilirsiniz.</p>
+            </div>
+            <div class="cars-grid">
+                <!-- Araç 1 - hako.png -->
+                <div class="car-card" data-daily-price="5000">
+                    <img src="hako.png" alt="Mojo Elite" onerror="this.src='https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=500'">
+                    <div class="car-info">
+                        <div class="car-subtitle">Mojo Luxury Segment</div>
+                        <div class="car-desc">Premium Sport Pack V.I.P</div>
+                        <div class="specs">
+                            <span><i class="fa-solid fa-gears"></i> Otomatik</span>
+                            <span><i class="fa-solid fa-gas-pump"></i> Hibrit</span>
+                        </div>
+                        <div class="price-box">
+                            <div class="daily-price">5.000 TL / Gün</div>
+                            <div class="total-calculated-box">Toplam tutar hesaplanıyor...</div>
+                            <a href="https://instagram.com/7mojoo" target="_blank" class="btn-insta-rent">
+                                <i class="fab fa-instagram"></i> @7mojoo Rezervasyon
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Araç 2 - hako1.png -->
+                <div class="car-card" data-daily-price="10000">
+                    <img src="hako1.png" alt="Mojo Executive" onerror="this.src='https://images.unsplash.com/photo-1617788138017-80ad40651399?w=500'">
+                    <div class="car-info">
+                        <div class="car-subtitle">Mojo Executive Segment</div>
+                        <div class="car-desc">Ultra Comfort V.I.P Prestige</div>
+                        <div class="specs">
+                            <span><i class="fa-solid fa-gears"></i> Otomatik</span>
+                            <span><i class="fa-solid fa-gas-pump"></i> Benzin</span>
+                        </div>
+                        <div class="price-box">
+                            <div class="daily-price">10.000 TL / Gün</div>
+                            <div class="total-calculated-box">Toplam tutar hesaplanıyor...</div>
+                            <a href="https://instagram.com/7mojoo" target="_blank" class="btn-insta-rent">
+                                <i class="fab fa-instagram"></i> @7mojoo Rezervasyon
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Araç 3 - hako2.png -->
+                <div class="car-card" data-daily-price="15000">
+                    <img src="hako2.png" alt="Mojo Grand" onerror="this.src='https://images.unsplash.com/photo-1555215695-3004980ad54e?w=500'">
+                    <div class="car-info">
+                        <div class="car-subtitle">Mojo SuperSport Segment</div>
+                        <div class="car-desc">F1 Track Dynamic Edition</div>
+                        <div class="specs">
+                            <span><i class="fa-solid fa-gears"></i> Otomatik</span>
+                            <span><i class="fa-solid fa-gas-pump"></i> Benzin</span>
+                        </div>
+                        <div class="price-box">
+                            <div class="daily-price">15.000 TL / Gün</div>
+                            <div class="total-calculated-box">Toplam tutar hesaplanıyor...</div>
+                            <a href="https://instagram.com/7mojoo" target="_blank" class="btn-insta-rent">
+                                <i class="fab fa-instagram"></i> @7mojoo Rezervasyon
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Araç 4 - hako3.png -->
+                <div class="car-card" data-daily-price="20000">
+                    <img src="hako3.png" alt="Mojo Hyper" onerror="this.src='https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=500'">
+                    <div class="car-info">
+                        <div class="car-subtitle">Mojo Hyper-Exclusive</div>
+                        <div class="car-desc">Limited Edition Özel Seri</div>
+                        <div class="specs">
+                            <span><i class="fa-solid fa-gears"></i> Otomatik</span>
+                            <span><i class="fa-solid fa-gas-pump"></i> Elektrik</span>
+                        </div>
+                        <div class="price-box">
+                            <div class="daily-price">20.000 TL / Gün</div>
+                            <div class="total-calculated-box">Toplam tutar hesaplanıyor...</div>
+                            <a href="https://instagram.com/7mojoo" target="_blank" class="btn-insta-rent">
+                                <i class="fab fa-instagram"></i> @7mojoo Rezervasyon
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- İLETİŞİM VE FOOTER BÖLÜMÜ -->
+        <footer id="contact">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h3>MOJO <span>RENT A CAR</span></h3>
+                    <p>İstanbul'un köklü ve lider VIP araç kiralama markası.</p>
+                    <p><i class="fa-solid fa-phone"></i> Müşteri Hizmetleri: +90 (212) 555 MOJO</p>
+                    <p><i class="fa-solid fa-envelope"></i> info@mojorentacar.com</p>
+                </div>
+                <div class="footer-social">
+                    <h4>Sosyal Medyada Biz</h4>
+                    <p>Hızlı kiralama prosedürleri ve anlık fiyat teklifleri için profilimizi ziyaret edin:</p>
+                    <a href="https://instagram.com/7mojoo" target="_blank" class="instagram-large-btn">
+                        <i class="fab fa-instagram"></i> @7mojoo
+                    </a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2026 Mojo Rent A Car. Tüm Hakları Saklıdır.
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- JAVASCRIPT KODLARI -->
+    <script>
+        // Sayfa açılır açılmaz çalışacak garanti zamanlayıcı (Harici kütüphaneleri beklemez)
+        function initMojoSite() {
+            const loader = document.getElementById('loader-wrapper');
+            const mainSite = document.getElementById('main-site');
+            
+            // 3 saniye sonra yükleme ekranını yumuşakça kapatır
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    mainSite.style.display = 'block';
+                    // Küçük bir gecikmeyle görünürlüğü tetikle (fading efekti için)
+                    setTimeout(() => {
+                        mainSite.style.opacity = '1';
+                    }, 50);
+                }, 500);
+            }, 3000);
+        }
+
+        // Garanti çalıştırma metodları
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            initMojoSite();
+        } else {
+            document.addEventListener('DOMContentLoaded', initMojoSite);
+        }
+
+        // Hesaplama ve Filoya Kaydırma Fonksiyonu
+        document.getElementById('rental-search-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const date1 = new Date(document.getElementById('pickup-date').value);
+            const date2 = new Date(document.getElementById('dropoff-date').value);
+            
+            const timeDiff = date2.getTime() - date1.getTime();
+            const totalDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            
+            if (isNaN(totalDays) || totalDays <= 0) {
+                alert("Lütfen geçerli bir iade tarihi giriniz!");
+                return;
+            }
+
+            const carCards = document.querySelectorAll('.car-card');
+            carCards.forEach(card => {
+                const dailyPrice = parseInt(card.getAttribute('data-daily-price'));
+                const totalPrice = dailyPrice * totalDays;
+                const formattedTotal = totalPrice.toLocaleString('tr-TR');
+                
+                const calcBox = card.querySelector('.total-calculated-box');
+                calcBox.innerHTML = `<i class="fa-solid fa-calculator"></i> ${totalDays} Günlük Toplam: ${formattedTotal} TL`;
+                calcBox.style.style.display = 'block';
+                calcBox.style.display = 'block';
+            });
+
+            document.getElementById('cars').scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
 </body>
 </html>
